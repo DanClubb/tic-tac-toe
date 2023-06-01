@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.cell {
+  @apply relative flex h-24 w-24 items-center justify-center bg-white hover:cursor-pointer sm:h-32 sm:w-32 md:h-44 md:w-44;
+}
+
+.cross {
+  @apply absolute left-1/2 top-1/2 h-0 w-3 -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-orange-400 sm:w-3.5 md:w-5;
+  animation: increase 0.2s linear forwards;
+}
+
+.circle {
+  stroke-dasharray: 450;
+  stroke-dashoffset: 450;
+  animation: draw 0.4s linear forwards;
+}
+
+.animation-delay {
+  animation-delay: 0.4s;
+}
+
+/* ---- Animations ---- */
+
+@keyframes increase {
+  100% {
+    @apply h-24;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---- Breakpoints ---- */
+
+@media screen(sm) {
+  @keyframes increase {
+    100% {
+      @apply h-32;
+    }
+  }
+}
+
+@media screen(md) {
+  @keyframes increase {
+    100% {
+      @apply h-44;
+    }
+  }
+}
