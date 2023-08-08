@@ -1,6 +1,8 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import socket from "../socket";
 import Cross from "../components/Cross";
 import Circle from "../components/Circle";
+import { Link } from "react-router-dom";
 
 function GameBoard() {
   const [crosses, setCrosses] = useState<number[]>([]);
@@ -9,12 +11,25 @@ function GameBoard() {
   const [gameState, setGameState] = useState("playing");
   const GRID_CELLS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+  socket.on("receive move", (move: string, cell: number) => {
+    if (!(crosses.includes(cell) || circles.includes(cell))) {
+      if (move === "cross") {
+        setCrosses((prev) => [...prev, cell]);
+      }
+      if (move === "circle") {
+        setCircles((prev) => [...prev, cell]);
+      }
+    }
+  });
+
   const handleCellClick = (cell: number) => {
     if (!(crosses.includes(cell) || circles.includes(cell))) {
       if (turn === "cross") {
+        socket.emit("make move", "cross", cell);
         setCrosses((prev) => [...prev, cell]);
       }
       if (turn === "circle") {
+        socket.emit("make move", "circle", cell);
         setCircles((prev) => [...prev, cell]);
       }
     }
@@ -66,7 +81,7 @@ function GameBoard() {
   console.log(turn);
 
   return (
-    <Fragment>
+    <main>
       <h3 className="my-16 text-center text-4xl uppercase">Your turn</h3>
       <section className="mx-auto grid w-fit grid-cols-3 gap-2 bg-slate-500">
         {GRID_CELLS.map((cell) => {
@@ -102,7 +117,8 @@ function GameBoard() {
           </span>
         </button>
       )}
-    </Fragment>
+      <Link to="/">Back</Link>
+    </main>
   );
 }
 

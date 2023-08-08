@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
+
 .cell {
   @apply relative flex h-24 w-24 items-center justify-center bg-white hover:cursor-pointer sm:h-32 sm:w-32 md:h-44 md:w-44;
 }
