@@ -8,6 +8,7 @@ function GameBoard() {
   const [crosses, setCrosses] = useState<number[]>([]);
   const [circles, setCircles] = useState<number[]>([]);
   const [turn, setTurn] = useState("cross");
+  const [room, setRoom] = useState(sessionStorage.getItem("room"));
   const [gameState, setGameState] = useState("playing");
   const GRID_CELLS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -33,6 +34,16 @@ function GameBoard() {
         setCircles((prev) => [...prev, cell]);
       }
     }
+  };
+
+  const handleTurn = () => {
+    socket.emit("get turns");
+  };
+
+  const leaveRoom = () => {
+    socket.emit("leave room", room);
+    setRoom("");
+    sessionStorage.removeItem("room");
   };
 
   const checkForWin = useCallback((): boolean => {
@@ -78,10 +89,10 @@ function GameBoard() {
   useEffect(() => {
     checkResult();
   }, [crosses, circles, checkResult]);
-  console.log(turn);
 
   return (
     <main>
+      <h2>Room: {room}</h2>
       <h3 className="my-16 text-center text-4xl uppercase">Your turn</h3>
       <section className="mx-auto grid w-fit grid-cols-3 gap-2 bg-slate-500">
         {GRID_CELLS.map((cell) => {
@@ -117,7 +128,9 @@ function GameBoard() {
           </span>
         </button>
       )}
-      <Link to="/">Back</Link>
+      <Link to="/" onClick={leaveRoom}>
+        Back
+      </Link>
     </main>
   );
 }
