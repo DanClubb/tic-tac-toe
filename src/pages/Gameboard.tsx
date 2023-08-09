@@ -26,19 +26,22 @@ function GameBoard() {
   const handleCellClick = (cell: number) => {
     if (!(crosses.includes(cell) || circles.includes(cell))) {
       if (turn === "cross") {
-        socket.emit("make move", "cross", cell);
+        socket.emit("make move", "cross", cell, room);
         setCrosses((prev) => [...prev, cell]);
       }
       if (turn === "circle") {
-        socket.emit("make move", "circle", cell);
+        socket.emit("make move", "circle", cell, room);
         setCircles((prev) => [...prev, cell]);
       }
     }
   };
 
-  const handleTurn = () => {
-    socket.emit("get turns");
-  };
+  useEffect(() => {
+    const handleTurn = () => {
+      socket.emit("get turns", room);
+    };
+    handleTurn();
+  }, []);
 
   const leaveRoom = () => {
     socket.emit("leave room", room);
