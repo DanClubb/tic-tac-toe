@@ -16,7 +16,7 @@ app.use(cors());
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://tic-tac-toe-6mi5.onrender.com",
   },
 });
 
