@@ -7,10 +7,16 @@ import { Link } from "react-router-dom";
 function GameBoard() {
   const [crosses, setCrosses] = useState<number[]>([]);
   const [circles, setCircles] = useState<number[]>([]);
+  const [playerSymbol, setPlayerSymbol] = useState<string>();
   const [turn, setTurn] = useState("cross");
   const [room, setRoom] = useState(sessionStorage.getItem("room"));
-  const [gameState, setGameState] = useState("playing");
+  const [gameState, setGameState] = useState<string>();
   const GRID_CELLS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  socket.on("start game", (symbol) => {
+    setGameState("playing");
+    setPlayerSymbol(symbol);
+  });
 
   socket.on("receive move", (move: string, cell: number) => {
     if (!(crosses.includes(cell) || circles.includes(cell))) {
@@ -37,11 +43,8 @@ function GameBoard() {
   };
 
   useEffect(() => {
-    const handleTurn = () => {
-      socket.emit("get turns", room);
-    };
-    handleTurn();
-  }, []);
+    socket.emit("room joined", room);
+  }, [room]);
 
   const leaveRoom = () => {
     socket.emit("leave room", room);
@@ -96,15 +99,21 @@ function GameBoard() {
   return (
     <main>
       <h2>Room: {room}</h2>
-      <h3 className="my-16 text-center text-4xl uppercase">Your turn</h3>
+      <h3
+        className={`my-16 text-center text-4xl uppercase font-bold ${
+          playerSymbol === "cross" ? "text-orange-400" : "text-violet-500"
+        }`}
+      >
+        {playerSymbol === turn ? "Your turn!" : "Waiting for opponent!"}
+      </h3>
       <section className="mx-auto grid w-fit grid-cols-3 gap-2 bg-slate-500">
         {GRID_CELLS.map((cell) => {
           return (
             <button
               key={cell}
-              className="cell"
+              className={`cell ${gameState !== "playing" && "disabled-cell"}`}
               onClick={() => handleCellClick(cell)}
-              disabled={gameState !== "playing"}
+              disabled={gameState !== "playing" || playerSymbol !== turn}
             >
               {(crosses.includes(cell) && <Cross />) ||
                 (circles.includes(cell) && <Circle />)}

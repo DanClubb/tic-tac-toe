@@ -13,13 +13,6 @@ function Home() {
     form.current?.checkValidity();
     form.current?.reportValidity();
 
-    if (
-      form.current?.checkValidity() === true &&
-      form.current?.reportValidity() === true
-    ) {
-      setValid(true);
-    }
-
     if (!roomFull) {
       socket.emit("join room", room);
       sessionStorage.setItem("room", room!);
@@ -27,14 +20,21 @@ function Home() {
   };
 
   const checkRoomAvailability = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRoom(e.target.value);
-    setRoomFull(null);
+    if (
+      form.current?.checkValidity() === true &&
+      form.current?.reportValidity() === true
+    ) {
+      setValid(true);
 
-    socket.emit("check room", e.target.value);
+      setRoom(e.target.value);
+      setRoomFull(null);
 
-    socket.on("room full", (message) => {
-      setRoomFull(message);
-    });
+      socket.emit("check room", e.target.value);
+
+      socket.on("room full", (message) => {
+        setRoomFull(message);
+      });
+    }
   };
 
   return (
