@@ -25,6 +25,9 @@
     "typescript": "^5.2.2",
     "web-vitals": "^3.5.0"
   },
+  "overrides": {
+    "typescript": "^5.2.2"
+  },
   "scripts": {
     "start": "node server/server.js",
     "server-start": "nodemon server/server.js",
