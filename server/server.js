@@ -27,8 +27,10 @@ const io = new Server(server, {
 
 ///////// ACCESSING ROOMS /////////
 io.on("connection", (socket) => {
+  console.log(socket);
   socket.on("join room", (room) => {
     socket.join(room);
+    console.log("socket joined room");
   });
 
   socket.on("check room", (room) => {
