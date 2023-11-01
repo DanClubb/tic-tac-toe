@@ -4,15 +4,18 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
+import { SocketContextProvider } from "./contexts/socketContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <BrowserRouter>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+    <SocketContextProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </SocketContextProvider>
   </BrowserRouter>
 );
 

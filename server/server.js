@@ -14,9 +14,14 @@ app.use(express.static(buildPath));
 app.use(express.json());
 app.use(cors());
 
+// const io = new Server(server, {
+//   cors: {
+//     origin: "https://tic-tac-toe-6mi5.onrender.com",
+//   },
+// });
 const io = new Server(server, {
   cors: {
-    origin: "https://tic-tac-toe-6mi5.onrender.com",
+    origin: "http://localhost:8080",
   },
 });
 
@@ -41,15 +46,30 @@ io.on("connection", (socket) => {
 
   ///////// GAME /////////
 
-  socket.on("room joined", (room) => {
+  socket.on("room joined", async (room) => {
     if (io.sockets.adapter.rooms.get(room)?.size === 2) {
+      let playerIds = io.sockets.adapter.rooms.get(room);
+      const playAgainDefault = Object.assign(
+        ...Array.from(playerIds, (id) => ({ [id]: false }))
+      );
+
       socket.emit("start game", "cross");
       socket.to(room).emit("start game", "circle");
+      io.to(room).emit("play again default", playAgainDefault);
     }
   });
 
   socket.on("make move", (move, cell, room) => {
     socket.to(room).emit("receive move", move, cell);
+  });
+
+  socket.on("play again choice", (room, userChoice) => {
+    socket.to(room).emit("send user opponent choice", userChoice);
+
+    // if (playAgain === 2) {
+    //   console.log(playAgain);
+    //   socket.emit("play again");
+    // }
   });
 });
 

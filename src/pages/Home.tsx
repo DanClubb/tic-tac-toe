@@ -1,40 +1,33 @@
-import { Link } from "react-router-dom";
-import React, { useState, useRef } from "react";
-import socket from "../socket";
+import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useSocket } from "../contexts/socketContext";
 
 function Home() {
-  const [room, setRoom] = useState<string | null>(null);
+  const { socket, room, setRoom } = useSocket();
   const [roomFull, setRoomFull] = useState<string | null>(null);
-  const [valid, setValid] = useState<boolean>(false);
-
-  const form = useRef<HTMLFormElement>(null);
+  const navigation = useNavigate();
 
   const joinRoom = () => {
-    form.current?.checkValidity();
-    form.current?.reportValidity();
-
     if (!roomFull) {
       socket.emit("join room", room);
-      sessionStorage.setItem("room", room!);
+      navigation("/game-room");
     }
   };
 
   const checkRoomAvailability = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (
-      form.current?.checkValidity() === true &&
-      form.current?.reportValidity() === true
-    ) {
-      setValid(true);
+    setRoom(e.target.value.trim());
+    setRoomFull(null);
 
-      setRoom(e.target.value);
-      setRoomFull(null);
+    socket.emit("check room", e.target.value);
 
-      socket.emit("check room", e.target.value);
+    socket.on("room full", (message: string) => {
+      setRoomFull(message);
+    });
+  };
 
-      socket.on("room full", (message) => {
-        setRoomFull(message);
-      });
-    }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    joinRoom();
   };
 
   return (
@@ -43,7 +36,7 @@ function Home() {
         <span className="bold uppercase text-violet-500">Create</span> or{" "}
         <span className="bold uppercase text-orange-400">join</span> a room
       </h1>
-      <form ref={form}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <input
           className="border-2 border-violet-500 rounded-md mr-4 p-2 w-72 hover:outline-0 hover:shadow-md hover:shadow-violet-500 hover:transition-all"
           onChange={(e) => checkRoomAvailability(e)}
@@ -52,9 +45,7 @@ function Home() {
           required
         />
 
-        <Link
-          to={roomFull || !valid ? "" : "/gameboard"}
-          onClick={joinRoom}
+        <button
           className={`${
             roomFull
               ? "cursor-not-allowed"
@@ -62,7 +53,7 @@ function Home() {
           } border-2 border-orange-400 rounded-md px-5 py-2`}
         >
           GO
-        </Link>
+        </button>
       </form>
       <p className="text-lg text-red-500">{roomFull}</p>
     </main>
