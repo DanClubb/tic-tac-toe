@@ -14,16 +14,16 @@ app.use(express.static(buildPath));
 app.use(express.json());
 app.use(cors());
 
-// const io = new Server(server, {
-//   cors: {
-//     origin: "https://tic-tac-toe-6mi5.onrender.com",
-//   },
-// });
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:8080",
+    origin: "https://tic-tac-toe-6mi5.onrender.com",
   },
 });
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:8080",
+//   },
+// });
 
 ///////// ACCESSING ROOMS /////////
 io.on("connection", (socket) => {
