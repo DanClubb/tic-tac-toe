@@ -7,21 +7,9 @@ import Header from "../components/Header";
 import ScoreTracker from "../components/ScoreTracker";
 
 function GameRoom() {
-  const {
-    socket,
-    room,
-    turn,
-    setTurn,
-    setPlayerSymbol,
-    crosses,
-    setCrosses,
-    circles,
-    setCircles,
-    playAgainChoices,
-    setPlayAgainChoices,
-  } = useSocket();
+  const { socket, room, turn, setPlayerSymbol, crosses, circles } = useSocket();
 
-  const [gameState, setGameState] = useState("");
+  const [gameState, setGameState] = useState("pending");
   const [winCount, setWinCount] = useState<{ [key: string]: number }>({
     cross: 0,
     circle: 0,
@@ -33,20 +21,6 @@ function GameRoom() {
     setGameState("playing");
     setPlayerSymbol!(symbol);
   });
-
-  const resetGame = useCallback(() => {
-    setPlayAgainChoices({ user: undefined, opponent: undefined });
-    setCircles([]);
-    setCrosses([]);
-    setGameState("playing");
-    setShowModal(false);
-  }, [setCircles, setCrosses, setPlayAgainChoices]);
-
-  useEffect(() => {
-    if (playAgainChoices.user === true && playAgainChoices.opponent === true) {
-      setTimeout(() => resetGame(), 700);
-    }
-  }, [playAgainChoices.opponent, playAgainChoices.user, resetGame]);
 
   useEffect(() => {
     socket.emit("room joined", room);
@@ -92,7 +66,7 @@ function GameRoom() {
         setWinCount((prev) => {
           return { ...prev, cross: prev["cross"] + 1 };
         });
-      setShowModal(true);
+      setTimeout(() => setShowModal(true), 700);
     } else if ([...crosses, ...circles].length === 9) {
       setGameState("draw");
       setShowModal(true);
@@ -110,7 +84,13 @@ function GameRoom() {
       <Gameboard gameState={gameState} />
       <ScoreTracker winCount={winCount} />
 
-      {showModal && <EndGameModal gameState={gameState} />}
+      {showModal && (
+        <EndGameModal
+          gameState={gameState}
+          setGameState={setGameState}
+          setShowModal={setShowModal}
+        />
+      )}
     </main>
   );
 }

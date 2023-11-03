@@ -1,6 +1,5 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://tic-tac-toe-6mi5.onrender.com/");
-// const socket = io("http://localhost:8080");
+const socket = io(process.env.REACT_APP_URL);
 
 export default socket;

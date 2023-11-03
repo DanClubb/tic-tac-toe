@@ -1,11 +1,11 @@
 import Cell from "../components/Cell";
 import { useSocket } from "../contexts/socketContext";
 
-interface Props {
+interface GameBoardProps {
   gameState: string;
 }
 
-export default function Gameboard({ gameState }: Props) {
+export default function Gameboard({ gameState }: GameBoardProps) {
   const { socket, setTurn, crosses, setCrosses, circles, setCircles } =
     useSocket();
   const GRID_CELLS = [1, 2, 3, 4, 5, 6, 7, 8, 9];

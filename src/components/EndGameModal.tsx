@@ -5,11 +5,26 @@ import LoadingSpinner from "./LoadingSpinner";
 
 interface EndGameModalProps {
   gameState: string;
+  setGameState: React.Dispatch<React.SetStateAction<string>>;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function EndGameModal({ gameState }: EndGameModalProps) {
-  const { socket, turn, room, playAgainChoices, setPlayAgainChoices } =
-    useSocket();
+export default function EndGameModal({
+  gameState,
+  setGameState,
+  setShowModal,
+}: EndGameModalProps) {
+  const {
+    socket,
+    turn,
+    room,
+    setTurn,
+    setPlayerSymbol,
+    setCrosses,
+    setCircles,
+    playAgainChoices,
+    setPlayAgainChoices,
+  } = useSocket();
   const [timer, setTimer] = useState(30);
   const navigation = useNavigate();
 
@@ -19,11 +34,13 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
       if (userChoice === "yes") return { ...prev, user: true };
       else return { ...prev, user: false };
     });
-    if (userChoice === "no")
+    if (userChoice === "no") {
       setTimeout(() => {
         socket.emit("leave room", room);
+        resetGame("pending");
         navigation("/");
       }, 700);
+    }
   };
 
   const receiveOpponentPlayAgainChoice = (opponentChoice: string) => {
@@ -31,25 +48,55 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
       if (opponentChoice === "yes") return { ...prev, opponent: true };
       else return { ...prev, opponent: false };
     });
-    if (opponentChoice === "no")
+    if (opponentChoice === "no") {
       setTimeout(() => {
         socket.emit("leave room", room);
+        resetGame("pending");
         navigation("/");
       }, 700);
+    }
   };
 
   socket.on("send user opponent choice", (opponentChoice: string) =>
     receiveOpponentPlayAgainChoice(opponentChoice)
   );
 
+  const resetGame = useCallback(
+    (chosenGameState: string) => {
+      setPlayAgainChoices({ user: undefined, opponent: undefined });
+      setCircles([]);
+      setCrosses([]);
+      setPlayerSymbol(null);
+      setTurn("cross");
+      setGameState(chosenGameState);
+      setShowModal(false);
+    },
+    [
+      setCircles,
+      setCrosses,
+      setGameState,
+      setPlayAgainChoices,
+      setPlayerSymbol,
+      setShowModal,
+      setTurn,
+    ]
+  );
+
+  useEffect(() => {
+    if (playAgainChoices.user === true && playAgainChoices.opponent === true) {
+      setTimeout(() => resetGame("playing"), 700);
+    }
+  }, [playAgainChoices.opponent, playAgainChoices.user, resetGame]);
+
   const startTimer = useCallback(() => {
     if (timer === 0) {
       socket.emit("leave room", room);
+      resetGame("pending");
       navigation("/");
     } else {
       setTimeout(() => setTimer((prev) => prev - 1), 1000);
     }
-  }, [navigation, room, socket, timer]);
+  }, [navigation, resetGame, room, socket, timer]);
 
   useEffect(() => {
     startTimer();
@@ -57,7 +104,7 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
   return (
     <div className="w-full h-full z-10 absolute top-0 ">
       <div className="w-full h-full bg-slate-400 opacity-75 z-20"></div>
-      <div className="w-4/12 p-6 bg-white absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-30 rounded-lg">
+      <div className="w-11/12 sm:w-4/12 p-6 bg-white absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-30 rounded-lg">
         {/*  */}
         {(gameState === "draw" || gameState === "win") && (
           <div className="flex items-center justify-center gap-2 mx-auto mt-8 text-5xl font-bold">
@@ -78,18 +125,19 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
           </div>
         )}
         <h1 className="text-3xl text-center">Play Again?</h1>
-        <div className="flex justify-between align-center mt-6 px-16">
+        <div className="flex justify-between align-center mt-6 px-2 sm:px-16">
           {/*  */}
-          <div className="flex flex-col">
+          <div className="flex flex-col w-36">
             <h2 className="mb-2 text-3xl text-center">You</h2>
             {playAgainChoices.user === undefined && <LoadingSpinner />}
             {playAgainChoices.user === true && (
               <svg
+                className="self-center"
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
                 y="0px"
-                width="100"
-                height="100"
+                width="48"
+                height="48"
                 viewBox="0,0,256,256"
               >
                 <g
@@ -116,11 +164,12 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
             )}
             {playAgainChoices.user === false && (
               <svg
+                className="self-center"
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
                 y="0px"
-                width="100"
-                height="100"
+                width="48"
+                height="48"
                 viewBox="0,0,256,256"
               >
                 <g
@@ -147,16 +196,17 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
             )}
           </div>
           {/*  */}
-          <div className="flex flex-col">
+          <div className="flex flex-col w-36">
             <h2 className="mb-2 text-3xl text-center">Opponent</h2>
             {playAgainChoices.opponent === undefined && <LoadingSpinner />}
             {playAgainChoices.opponent === true && (
               <svg
+                className="self-center"
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
                 y="0px"
-                width="100"
-                height="100"
+                width="48"
+                height="48"
                 viewBox="0,0,256,256"
               >
                 <g
@@ -183,11 +233,12 @@ export default function EndGameModal({ gameState }: EndGameModalProps) {
             )}
             {playAgainChoices.opponent === false && (
               <svg
+                className="self-center"
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
                 y="0px"
-                width="100"
-                height="100"
+                width="48"
+                height="48"
                 viewBox="0,0,256,256"
               >
                 <g

@@ -3,6 +3,7 @@ const path = require("path");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 const port = 8080;
@@ -16,21 +17,14 @@ app.use(cors());
 
 const io = new Server(server, {
   cors: {
-    origin: "https://tic-tac-toe-6mi5.onrender.com",
+    origin: process.env.REACT_APP_URL,
   },
 });
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:8080",
-//   },
-// });
 
 ///////// ACCESSING ROOMS /////////
 io.on("connection", (socket) => {
-  console.log(socket);
   socket.on("join room", (room) => {
     socket.join(room);
-    console.log("socket joined room");
   });
 
   socket.on("check room", (room) => {
@@ -50,14 +44,8 @@ io.on("connection", (socket) => {
 
   socket.on("room joined", async (room) => {
     if (io.sockets.adapter.rooms.get(room)?.size === 2) {
-      let playerIds = io.sockets.adapter.rooms.get(room);
-      const playAgainDefault = Object.assign(
-        ...Array.from(playerIds, (id) => ({ [id]: false }))
-      );
-
       socket.emit("start game", "cross");
       socket.to(room).emit("start game", "circle");
-      io.to(room).emit("play again default", playAgainDefault);
     }
   });
 
@@ -67,11 +55,6 @@ io.on("connection", (socket) => {
 
   socket.on("play again choice", (room, userChoice) => {
     socket.to(room).emit("send user opponent choice", userChoice);
-
-    // if (playAgain === 2) {
-    //   console.log(playAgain);
-    //   socket.emit("play again");
-    // }
   });
 });
 
