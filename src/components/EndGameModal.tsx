@@ -66,10 +66,12 @@ export default function EndGameModal({
       setPlayAgainChoices({ user: undefined, opponent: undefined });
       setCircles([]);
       setCrosses([]);
-      setPlayerSymbol(null);
-      setTurn("cross");
       setGameState(chosenGameState);
       setShowModal(false);
+      if (chosenGameState === "pending") {
+        setPlayerSymbol(null);
+        setTurn("cross");
+      }
     },
     [
       setCircles,
