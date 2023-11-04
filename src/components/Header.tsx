@@ -8,7 +8,7 @@ function Header() {
     setRoom("");
   };
   return (
-    <div className="flex justify-between items-center mt-4 mb-10 md:mb-7 xl:mb-9 2xl:mb-12">
+    <div className="flex justify-between items-center mt-4 mb-[30vh] md:mb-7 xl:mb-9 2xl:mb-12">
       <Link
         to="/"
         onClick={leaveRoom}
