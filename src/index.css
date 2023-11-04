@@ -15,7 +15,7 @@ body {
 }
 
 .cell {
-  @apply relative flex h-24 w-24 items-center justify-center bg-white hover:cursor-pointer sm:h-32 sm:w-32 md:h-44 md:w-44;
+  @apply relative flex h-24 w-24 items-center justify-center bg-white hover:cursor-pointer sm:h-32 sm:w-32 md:h-36 md:w-36 xl:h-40 xl:w-40 2xl:h-48 2xl:w-48;
 }
 
 .disabled-cell {

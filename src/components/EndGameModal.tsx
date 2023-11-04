@@ -106,10 +106,10 @@ export default function EndGameModal({
   return (
     <div className="w-full h-full z-10 absolute top-0 ">
       <div className="w-full h-full bg-slate-400 opacity-75 z-20"></div>
-      <div className="w-11/12 sm:w-4/12 p-6 bg-white absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-30 rounded-lg">
+      <div className="w-11/12 sm:w-9/12 md:w-7/12 lg:w-6/12 xl:w-4/12 p-6 bg-white absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-30 rounded-lg">
         {/*  */}
         {(gameState === "draw" || gameState === "win") && (
-          <div className="flex items-center justify-center gap-2 mx-auto mt-8 text-5xl font-bold">
+          <div className="flex items-center justify-center gap-2 mx-auto mt-8 mb-4 text-5xl font-bold">
             {gameState === "draw" ? (
               <p>It's a draw!</p>
             ) : (
@@ -127,7 +127,7 @@ export default function EndGameModal({
           </div>
         )}
         <h1 className="text-3xl text-center">Play Again?</h1>
-        <div className="flex justify-between align-center mt-6 px-2 sm:px-16">
+        <div className="flex justify-between align-center mt-6 px-2 sm:px-12">
           {/*  */}
           <div className="flex flex-col w-36">
             <h2 className="mb-2 text-3xl text-center">You</h2>
@@ -268,8 +268,14 @@ export default function EndGameModal({
           </div>
         </div>
         {/*  */}
-        <div>{timer}</div>
-        <div className="flex justify-center align-center gap-3 mt-20">
+        <div
+          className={`text-xl text-center mt-14 font-semibold ${
+            timer % 2 === 0 ? "text-violet-500" : "text-orange-400"
+          }`}
+        >
+          {timer}
+        </div>
+        <div className="flex justify-center align-center mt-8 gap-3">
           <button
             className="px-4 py-2 bg-green-400 rounded"
             onClick={() => handleUserPlayAgainChoice("yes")}
@@ -277,7 +283,7 @@ export default function EndGameModal({
             Yes
           </button>
           <button
-            className="px-4 py-2 bg-red-500 rounded"
+            className="px-4 py-2 bg-red-400 rounded"
             onClick={() => handleUserPlayAgainChoice("no")}
           >
             No
